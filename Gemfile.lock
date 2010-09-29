@@ -1,0 +1,45 @@
+PATH
+  remote: .
+  specs:
+    fast-mailer (0.0.1)
+      i18n
+      mail (~> 2.2.5)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    activesupport (3.0.0)
+    autotest (4.3.2)
+    diff-lcs (1.1.2)
+    i18n (0.4.1)
+    mail (2.2.6.1)
+      activesupport (>= 2.3.6)
+      mime-types
+      treetop (>= 1.4.5)
+    mime-types (1.16)
+    polyglot (0.3.1)
+    rake (0.8.7)
+    rspec (2.0.0.beta.22)
+      rspec-core (= 2.0.0.beta.22)
+      rspec-expectations (= 2.0.0.beta.22)
+      rspec-mocks (= 2.0.0.beta.22)
+    rspec-core (2.0.0.beta.22)
+    rspec-expectations (2.0.0.beta.22)
+      diff-lcs (>= 1.1.2)
+    rspec-mocks (2.0.0.beta.22)
+      rspec-core (= 2.0.0.beta.22)
+      rspec-expectations (= 2.0.0.beta.22)
+    treetop (1.4.8)
+      polyglot (>= 0.3.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  autotest
+  bundler (~> 1.0.0)
+  fast-mailer!
+  i18n
+  mail (~> 2.2.5)
+  rake (~> 0.8.7)
+  rspec (~> 2.0.0.beta.22)
