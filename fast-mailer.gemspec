@@ -9,6 +9,7 @@ spec = Gem::Specification.new do |s|
   s.homepage = 'http://github.com/erikhansson/fast-mailer'
   s.summary = 'Help with sending emails.'
   s.description = 'Helps with sending emails fast, and with convenient configuration.'
+  s.rubyforge_project = "nowarning"
 
   s.required_rubygems_version = ">= 1.3.6"
   
@@ -20,7 +21,7 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency 'rake', '~> 0.8.7'
   s.add_development_dependency 'autotest'
   
-  s.files = Dir.glob("{bin,lib}/**/*") + %w(LICENC VERSION)
+  s.files = Dir.glob("{bin,lib}/**/*") + %w(LICENCE VERSION README.md)
   s.executables = []
   s.require_path = 'lib'
   
