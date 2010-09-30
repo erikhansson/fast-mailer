@@ -36,6 +36,17 @@ describe FastMailer::SMTP do
   end
   
   describe ":deliver callbacks" do
+    before(:all) do
+      @smtp_class = Class.new(FastMailer::SMTP)
+      @smtp_class.class_eval do
+        attr_accessor :executed
+        
+        def mark_executed(*args)
+          @executed = true
+        end
+      end
+    end
+    
     before(:each) do
       @mail = Mail.new do
         to 'one@test.com'
@@ -45,34 +56,42 @@ describe FastMailer::SMTP do
       end
     end
     
-    after(:each) do
-      FastMailer.class_variable_set '@@before_deliver', nil
-    end
-    
     
     it "should call FastMailer.before_deliver before delivering a mail" do
-      executed = false
-      FastMailer.before_deliver do
-        executed = true
+      c = Class.new(@smtp_class)
+      c.class_eval do
+        before_deliver :mark_executed
       end
-      executed.should be_false
-      FastMailer::SMTP.new.deliver @mail
-      executed.should be_true
+      
+      smtp = c.new
+      smtp.executed.should be_false
+      smtp.deliver @mail
+      smtp.executed.should be_true
     end
     
     it "should call FastMailer.after_deliver before delivering a mail" do
-      executed = false
-      FastMailer.after_deliver do
-        executed = true
+      c = Class.new(@smtp_class)
+      c.class_eval do
+        after_deliver :mark_executed
       end
-      executed.should be_false
-      FastMailer::SMTP.new.deliver @mail
-      executed.should be_true
+      
+      smtp = c.new
+      smtp.executed.should be_false
+      smtp.deliver @mail
+      smtp.executed.should be_true
     end
     
-    it "should cancel if FastMailer.before_deliver returns false" do
-      FastMailer.before_deliver() { false }
-      FastMailer::SMTP.new.deliver @mail
+    it "should cancel if a before_deliver hook calls :skip_delivery!" do
+      c = Class.new(@smtp_class)
+      c.class_eval do
+        before_deliver :skip_delivery
+        def skip_delivery(mail)
+          skip_delivery!
+        end
+      end
+      
+      smtp = c.new
+      smtp.deliver @mail
       FastMailer::MockSMTP.deliveries.size.should == 0
     end
     
@@ -81,18 +100,21 @@ describe FastMailer::SMTP do
       mock.should_receive(:sendmail).once.and_raise(ArgumentError.new "foobar")
       FastMailer::MockSMTP.should_receive(:new).once.and_return mock
       
-      executed = false
-      FastMailer.after_deliver do |mail, exception|
-        mail.to[0].should == 'one@test.com'
-        exception.message.should == 'foobar'
-        executed = true
+      c = Class.new(@smtp_class)
+      c.class_eval do
+        attr_accessor :exception
+        after_deliver :callback
+        def callback(mail, exception = nil)
+          @exception = exception
+        end
       end
       
-      executed.should be_false
+      smtp = c.new
+      smtp.exception.should be_nil
       -> do
-        FastMailer::SMTP.new.deliver @mail
+        smtp.deliver @mail
       end.should raise_exception
-      executed.should be_true
+      smtp.exception.should be_a_kind_of(ArgumentError)
     end
   end
   

@@ -15,6 +15,7 @@ spec = Gem::Specification.new do |s|
   
   s.add_dependency 'mail', '~> 2.2.5'
   s.add_dependency 'i18n'
+  s.add_dependency 'hooks', '~> 0.1'
 
   s.add_development_dependency 'bundler', '~> 1.0.0'
   s.add_development_dependency 'rspec', '~> 2.0.0.beta.22'

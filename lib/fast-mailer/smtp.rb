@@ -13,6 +13,11 @@ module FastMailer
   # sending mail on the same connection.
   class SMTP
     
+    include Hooks
+
+    define_hook :before_deliver
+    define_hook :after_deliver
+
     attr_accessor :configuration
     
     def initialize(options = nil)
@@ -53,8 +58,14 @@ module FastMailer
       FastMailer.test_mode ? FastMailer::MockSMTP : Net::SMTP
     end
     
+    def skip_delivery!
+      @skip_delivery = true
+    end
+    
     def perform_delivery(mail)
-      if FastMailer.on_before_deliver mail
+      run_hook :before_deliver, mail
+      
+      if !@skip_delivery
         # Set the envelope from to be either the return-path, the sender or the first from address
         envelope_from = mail.return_path || mail.sender || mail.from_addrs.first
         if envelope_from.blank?
@@ -73,13 +84,15 @@ module FastMailer
       
         begin
           @smtp.sendmail(message, envelope_from, destinations)
-          FastMailer.on_after_deliver mail
+          run_hook :after_deliver, mail
         rescue Exception => e
           @smtp = nil
-          FastMailer.on_after_deliver mail, e
+          run_hook :after_deliver, mail, e
           raise e
         end
       end
+    ensure
+      @skip_delivery = false
     end
     
   end
