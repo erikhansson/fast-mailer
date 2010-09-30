@@ -4,9 +4,7 @@ describe FastMailer::SMTP do
   
   before(:each) do
     FastMailer::MockSMTP.clear_deliveries
-    FastMailer.class_variable_set '@@before_deliver', nil
   end
-  
   
   
   describe 'initialization' do
@@ -46,6 +44,11 @@ describe FastMailer::SMTP do
         body 'testing smtp'
       end
     end
+    
+    after(:each) do
+      FastMailer.class_variable_set '@@before_deliver', nil
+    end
+    
     
     it "should call FastMailer.before_deliver before delivering a mail" do
       executed = false

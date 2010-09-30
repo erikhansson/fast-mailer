@@ -8,7 +8,7 @@ module FastMailer
     end
 
     def initialize(*args)
-      @@deliveries = []
+      @@deliveries ||= []
     end
 
     def sendmail(mail, from, to)

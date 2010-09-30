@@ -3,6 +3,7 @@ require 'mail'
 
 require 'fast-mailer/configuration'
 require 'fast-mailer/smtp'
+require 'fast-mailer/mailer'
 
 module FastMailer
   class <<self
