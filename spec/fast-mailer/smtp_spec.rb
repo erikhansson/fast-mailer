@@ -2,20 +2,17 @@ require File.expand_path('../../spec_helper', __FILE__)
 
 describe FastMailer::SMTP do
   
-  before(:all) do
-    FastMailer::Configuration.enable_testing!
-  end
-  
   before(:each) do
-    MockSMTP.clear_deliveries
+    FastMailer::MockSMTP.clear_deliveries
   end
   
   
   
   describe 'initialization' do
     it "should pass it's options through FastMailer::Configuration" do
+      FastMailer::Configuration.should_receive(:smtp_configuration).once.with(any_args).and_return 42
       smtp = FastMailer::SMTP.new 't22'
-      smtp.configuration.should == FastMailer::Configuration::TEST_CONFIGURATION
+      smtp.configuration.should == 42
     end
   end
   
@@ -28,14 +25,14 @@ describe FastMailer::SMTP do
         body 'testing smtp'
       end
       
-      Net::SMTP.should_receive(:new).with(any_args).once.and_return(MockSMTP.new)
       smtp = FastMailer::SMTP.new
+      smtp.should_receive(:connection_class).once.and_return FastMailer::MockSMTP
       smtp.open do
         smtp.deliver mail
         smtp.deliver mail
         smtp.deliver mail
       end
-      MockSMTP.deliveries.should have(3).emails
+      FastMailer::MockSMTP.deliveries.should have(3).emails
     end
   end
   

@@ -3,7 +3,7 @@ FastMailer
 
 FastMailer is a collection of helpers that aims to help with sending email.
 Specifically, it allows for convenient configuration and better throughput
-when sending multiple mails.
+when sending multiple mails using SMTP.
 
 
 Configuration
@@ -53,6 +53,17 @@ email, we can send multiple emails using a single connection.
       mail.to = 'another@recipient.com'
       smtp.deliver mail
     end
+
+
+Testing
+-------
+
+To enable testing, first run
+
+    FastMailer.test_mode = true
+
+This will cause FastMailer::SMTP to use FastMailer::MockSMTP rather than Net::SMTP. 
+You can then find your sent emails in FastMailer::MockSMTP.deliveries.
 
 
 Coming features

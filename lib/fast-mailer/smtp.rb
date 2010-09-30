@@ -25,7 +25,7 @@ module FastMailer
       configuration[:host] ||= configuration[:address]
       configuration[:username] ||= configuration[:user_name]
       
-      @smtp = Net::SMTP.new(configuration[:host], configuration[:port])
+      @smtp = connection_class.new(configuration[:host], configuration[:port])
       if configuration[:enable_starttls_auto]
         smtp.enable_starttls_auto if smtp.respond_to?(:enable_starttls_auto) 
       end
@@ -49,6 +49,10 @@ module FastMailer
     end
     
     private
+    def connection_class
+      FastMailer.test_mode ? FastMailer::MockSMTP : Net::SMTP
+    end
+    
     def perform_delivery(mail)
       
       # Set the envelope from to be either the return-path, the sender or the first from address

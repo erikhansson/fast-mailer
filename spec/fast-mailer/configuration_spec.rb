@@ -22,14 +22,6 @@ describe FastMailer::Configuration do
       result = FastMailer::Configuration.smtp_configuration nil
       result.should == { :foo => :bar }
     end
-    
-    it "should return test settings irrespective of argument if test-mode is enabled" do
-      FastMailer::Configuration.enable_testing!
-      FastMailer::Configuration.smtp_configuration.should == FastMailer::Configuration::TEST_CONFIGURATION
-      FastMailer::Configuration.smtp_configuration(nil).should == FastMailer::Configuration::TEST_CONFIGURATION
-      FastMailer::Configuration.smtp_configuration({ :foo => :bar }).should == FastMailer::Configuration::TEST_CONFIGURATION
-      FastMailer::Configuration.smtp_configuration('config.rb').should == FastMailer::Configuration::TEST_CONFIGURATION
-    end
   end
   
 end
