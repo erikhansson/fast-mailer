@@ -66,16 +66,30 @@ This will cause FastMailer::SMTP to use FastMailer::MockSMTP rather than Net::SM
 You can then find your sent emails in FastMailer::MockSMTP.deliveries.
 
 
-Coming features
+Parallelisation
 ---------------
 
-* Parallelisation: given a list of mails, or a mail generator, we can spin a number
-of threads up and let them send mail simultaneously. As most of the time is spent
-waiting for the network, this speeds the process up significantly.
+To send a large number of emails, you can use the FastMailer::Mailer class. Create
+it as an SMTP instance, but include an additional option :max_connections. When 
+calling send_all with a mail iterator (any object yielding Mail instances on :next), 
+:max_connections threads will be spawned, sending mail from the generator in parallel.
+
+    emails = [mail_1, mail_2, ..., mail_n]
+    mailer = FastMailer::Mailer.new
+    mailer.send_all emails.to_enum
+
+Note that the generator must not return modified instances of the same object 
+multiple times, since up to :max_connections mails will be processed at the same
+time.
+
+The :send_all call will not return until all mails have been sent. At this point, all
+spawned threads will have stopped.
+
+
+Coming features
+---------------
 
 * Logging: When sending large batches, sometimes things go wrong. If we keep track 
 of which mails have been sent and which have failed, we reduce the risk of finding
 ourselves wondering which of our users have received the message and which we need
 to send to.
-
-* Blacklisting: block addresses so they cannot be sent to.
