@@ -81,6 +81,15 @@ module FastMailer
         if message.blank?
           raise ArgumentError.new('A encoded content is required to send a message')
         end
+        
+        if @configuration[:blacklist]
+          destinations.each do |email|
+            if @configuration[:blacklist].blacklisted?(email)
+              raise FastMailer::BlacklistError.new(email)
+            end
+          end
+        end
+        
       
         begin
           @smtp.sendmail(message, envelope_from, destinations)

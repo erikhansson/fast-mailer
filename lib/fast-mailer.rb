@@ -2,9 +2,11 @@
 require 'mail'
 require 'hooks'
 
+require 'fast-mailer/exceptions'
 require 'fast-mailer/configuration'
 require 'fast-mailer/smtp'
 require 'fast-mailer/mailer'
+require 'fast-mailer/file_blacklist'
 
 module FastMailer
   

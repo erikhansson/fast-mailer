@@ -118,4 +118,39 @@ describe FastMailer::SMTP do
     end
   end
   
+  describe "when given a blacklist" do
+    before(:each) do
+      FastMailer::MockSMTP.clear_deliveries
+      @smtp = FastMailer::SMTP.new :blacklist => FastMailer::FileBlacklist.new(File.expand_path('../../fixtures/blacklist.txt', __FILE__))
+      @mail = Mail.new do
+        from 'two@test.com'
+        subject 'testing'
+        body 'testing smtp'
+      end
+    end
+    
+    it "should raise an exception rather than send to blacklisted addresses" do
+      @mail.to = 'foo@blacklist.com'
+      lambda do
+        @smtp.deliver @mail
+      end.should raise_error(FastMailer::BlacklistError)
+      FastMailer::MockSMTP.deliveries.should be_empty
+    end
+    
+    it "should not raise (blacklisting) exceptions for nonlisted emails" do
+      @mail.to = 'foo@whitelist.com'
+      lambda do
+        @smtp.deliver @mail
+      end.should_not raise_error
+      FastMailer::MockSMTP.deliveries.should have(1).email
+    end
+    
+    it "should check only the actual email address" do
+      @mail.to = 'Foobar <foo@blacklist.com>'
+      lambda do
+        @smtp.deliver @mail
+      end.should raise_error(FastMailer::BlacklistError)
+    end
+  end
+  
 end
