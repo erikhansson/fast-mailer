@@ -89,7 +89,11 @@ spawned threads will have stopped.
 Coming features
 ---------------
 
-* Logging: When sending large batches, sometimes things go wrong. If we keep track 
-of which mails have been sent and which have failed, we reduce the risk of finding
-ourselves wondering which of our users have received the message and which we need
-to send to.
+* Logging: Maybe add a convenient default logging component that will save a brief
+description of the sent mails (subject and all recipients, perhaps). The callbacks
+should be sufficient to handle the more general purpose requirements. I think.
+
+* Command-line utility: Add a command line utility that enables you to easily send
+email, both for testing purposes, and to get the finished emails out to large number
+of people. Depending on how many features this would need, maybe this should be a
+separate project?
