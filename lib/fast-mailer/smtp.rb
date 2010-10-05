@@ -21,6 +21,7 @@ module FastMailer
     attr_accessor :configuration
     
     def initialize(options = nil)
+      @mutex = Mutex.new
       @configuration = FastMailer::Configuration.smtp_configuration options
     end
     
@@ -63,7 +64,9 @@ module FastMailer
     end
     
     def perform_delivery(mail)
-      run_hook :before_deliver, mail
+      @mutex.synchronize do
+        run_hook :before_deliver, mail
+      end
       
       if !@skip_delivery
         # Set the envelope from to be either the return-path, the sender or the first from address
@@ -93,10 +96,14 @@ module FastMailer
       
         begin
           @smtp.sendmail(message, envelope_from, destinations)
-          run_hook :after_deliver, mail
+          @mutex.synchronize do
+            run_hook :after_deliver, mail
+          end
         rescue Exception => e
           @smtp = nil
-          run_hook :after_deliver, mail, e
+          @mutex.synchronize do
+            run_hook :after_deliver, mail, e
+          end
           raise e
         end
       end
